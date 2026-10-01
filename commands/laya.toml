@@ -1,0 +1,2 @@
+description = "Inspect Laya task-aware model router status and route history"
+prompt = "Analyze current session routing and report the active Laya route, model recommendations, and confidence."

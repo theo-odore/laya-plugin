@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laya-router"
+version = "0.1.0"
+description = "Adaptive, task-aware model routing plugin and decision layer for the Antigravity CLI"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "theodore" }
+]
+keywords = ["antigravity", "laya", "model-routing", "ai-agents", "llm-router"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "laya>=0.3.0",
+]
+
+[project.scripts]
+laya = "cli.laya_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["laya_router*", "hooks*", "cli*"]

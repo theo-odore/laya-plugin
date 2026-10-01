@@ -1,0 +1,11 @@
+{
+  "name": "laya-router",
+  "version": "0.1.0",
+  "description": "Adaptive, task-aware model routing plugin for the Antigravity CLI",
+  "skills": [
+    {
+      "name": "laya-router",
+      "path": "skills/laya-router"
+    }
+  ]
+}

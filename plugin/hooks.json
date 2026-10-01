@@ -1,0 +1,11 @@
+{
+  "laya-router": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python d:/project-ai/layal/hooks/pre_invocation.py",
+        "timeout": 30
+      }
+    ]
+  }
+}
