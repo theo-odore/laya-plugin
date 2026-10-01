@@ -1,6 +1,6 @@
 """
-Laya Router for Antigravity.
-Adaptive, task-aware model routing plugin and decision layer.
+Laya Router.
+Adaptive, task-aware model routing plugin and decision layer for AI coding agents (Antigravity, Claude Code, and more).
 """
 
 from laya_router.config import ROUTE_TO_MODEL_MAP, DEFAULT_CRITERIA

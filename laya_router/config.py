@@ -1,6 +1,6 @@
 """
 Configuration and model mappings for Laya Router.
-Maps high-level Laya routing categories to concrete Antigravity CLI models.
+Supports multi-agent runtimes including Antigravity, Claude Code, and standalone agents.
 """
 
 from typing import Dict, Any
@@ -12,28 +12,76 @@ DEFAULT_CRITERIA: Dict[str, str] = {
     "simple_change": "small code change, minor modification, typo fix, styling adjustment, or documentation tweak",
 }
 
-# Antigravity CLI (agy) model mappings
-# Matches models discovered from `agy models` on the host system
-ROUTE_TO_MODEL_MAP: Dict[str, Dict[str, str]] = {
-    "deep_build": {
-        "model": "claude-opus-4-6-thinking",
-        "fallback_model": "gemini-3.1-pro-high",
-        "effort": "high",
-        "description": "High-capacity reasoning model for architectural design and end-to-end multi-file building",
+# Model mappings per agent platform
+AGENT_MODEL_PROFILES: Dict[str, Dict[str, Dict[str, str]]] = {
+    # Antigravity CLI (agy)
+    "antigravity": {
+        "deep_build": {
+            "model": "claude-opus-4-6-thinking",
+            "fallback_model": "gemini-3.1-pro-high",
+            "effort": "high",
+            "description": "High-capacity reasoning model for architectural design and end-to-end multi-file building",
+        },
+        "bug_fix": {
+            "model": "claude-sonnet-4-6",
+            "fallback_model": "gemini-3.8-flash-high",
+            "effort": "high",
+            "description": "Balanced high-precision model for root cause analysis and targeted debugging",
+        },
+        "simple_change": {
+            "model": "gemini-3.8-flash-low",
+            "fallback_model": "gemini-3.7-flash-low",
+            "effort": "low",
+            "description": "Ultra-fast lightweight model for low-latency modifications and cosmetic edits",
+        },
     },
-    "bug_fix": {
-        "model": "claude-sonnet-4-6",
-        "fallback_model": "gemini-3.8-flash-high",
-        "effort": "high",
-        "description": "Balanced high-precision model for root cause analysis and targeted debugging",
+    # Claude Code
+    "claude_code": {
+        "deep_build": {
+            "model": "claude-opus-4-6-thinking",
+            "fallback_model": "claude-3-7-sonnet",
+            "effort": "high",
+            "description": "Deep thinking model for complex reasoning and large architectural scope",
+        },
+        "bug_fix": {
+            "model": "claude-3-7-sonnet",
+            "fallback_model": "claude-3-5-sonnet",
+            "effort": "medium",
+            "description": "High-precision agent model for targeted debugging and diagnostics",
+        },
+        "simple_change": {
+            "model": "claude-3-5-haiku",
+            "fallback_model": "claude-3-5-haiku",
+            "effort": "low",
+            "description": "Fast, cost-effective model for small tweaks and single-file changes",
+        },
     },
-    "simple_change": {
-        "model": "gemini-3.8-flash-low",
-        "fallback_model": "gemini-3.7-flash-low",
-        "effort": "low",
-        "description": "Ultra-fast lightweight model for low-latency modifications and cosmetic edits",
+    # Generic / Open-source LLM stacks
+    "generic": {
+        "deep_build": {
+            "model": "claude-opus-4-6-thinking",
+            "fallback_model": "gpt-4o",
+            "effort": "high",
+            "description": "High-reasoning model for complex systems",
+        },
+        "bug_fix": {
+            "model": "claude-sonnet-4-6",
+            "fallback_model": "gpt-4o-mini",
+            "effort": "medium",
+            "description": "Balanced model for debugging and issue resolution",
+        },
+        "simple_change": {
+            "model": "gemini-3.8-flash-low",
+            "fallback_model": "gpt-4o-mini",
+            "effort": "low",
+            "description": "Fast lightweight model for minor changes",
+        },
     },
 }
+
+# Default route to model mapping (defaults to Antigravity profile)
+DEFAULT_PROFILE = "antigravity"
+ROUTE_TO_MODEL_MAP = AGENT_MODEL_PROFILES[DEFAULT_PROFILE]
 
 # Safe general-purpose fallback model when classification is uncertain or below confidence threshold
 FALLBACK_ROUTE = "bug_fix"

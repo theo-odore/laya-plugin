@@ -35,8 +35,9 @@ class LayaRequestHandler(BaseHTTPRequestHandler):
             try:
                 data = json.loads(body)
                 prompt = data.get("prompt", "")
+                profile = data.get("profile", "antigravity")
                 engine = LayaDecisionEngine.get_instance()
-                decision = engine.evaluate(prompt)
+                decision = engine.evaluate(prompt, profile=profile)
                 
                 resp_payload = decision.to_dict()
                 self.send_response(200)

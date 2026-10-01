@@ -42,12 +42,12 @@ def spawn_daemon_background() -> None:
         pass
 
 
-def route_prompt(prompt: str) -> DecisionResult:
+def route_prompt(prompt: str, profile: str = "antigravity") -> DecisionResult:
     """
     Routes a prompt using the daemon if available, or in-process evaluation.
     """
     url = f"http://{DAEMON_HOST}:{DAEMON_PORT}/route"
-    payload = json.dumps({"prompt": prompt}).encode("utf-8")
+    payload = json.dumps({"prompt": prompt, "profile": profile}).encode("utf-8")
     
     try:
         req = urllib.request.Request(
@@ -74,4 +74,4 @@ def route_prompt(prompt: str) -> DecisionResult:
 
     # Fallback to direct in-process evaluation
     engine = LayaDecisionEngine.get_instance()
-    return engine.evaluate(prompt)
+    return engine.evaluate(prompt, profile=profile)

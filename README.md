@@ -1,43 +1,44 @@
-# Laya Router for Antigravity
+# Laya Router: Adaptive Model Routing for AI Coding Agents
 
-[![Antigravity Plugin](https://img.shields.io/badge/Antigravity-Plugin-4285F4?logo=google&logoColor=white)](https://github.com/theo-odore/laya-plugin)
+[![Antigravity](https://img.shields.io/badge/Antigravity-Plugin-4285F4?logo=google&logoColor=white)](https://github.com/theo-odore/laya-plugin)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-D97706?logo=anthropic&logoColor=white)](https://github.com/theo-odore/laya-plugin)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Laya](https://img.shields.io/badge/Laya-0.3.21-blueviolet)](https://github.com/ConvAI-Innovation/Laya)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Laya Router** is an intelligent, task-aware model-selection plugin and decision layer designed specifically for the **Antigravity CLI (`agy`)**.
+**Laya Router** is an intelligent, task-aware model-selection plugin and decision layer designed for modern AI coding agents — including **Antigravity (`agy`)**, **Claude Code**, and autonomous agent pipelines.
 
-Instead of manually switching models between large architectural requests and minor bug fixes, Laya Router automatically classifies incoming tasks, evaluates task complexity, and dynamically binds each request to the optimal Antigravity model.
+Instead of manually toggling models between large architectural initiatives and small cosmetic tweaks, Laya Router classifies incoming tasks in real time, evaluates complexity, and dynamically routes each request to the optimal model for the active agent runtime.
 
 ---
 
 ## The Problem
 
 In agentic software development, different tasks demand vastly different reasoning budgets:
-- **Architectural engineering** (e.g. building a greenfield microservice or full-stack application) requires deep reasoning models with expansive context awareness.
-- **Debugging & crash analysis** requires high-precision diagnostic models.
-- **Minor tweaks** (e.g. changing CSS colors, adjusting margins, fixing typos) do not warrant expensive reasoning models and are best handled by ultra-fast, low-latency models.
+- **Architectural engineering** (e.g., building a greenfield microservice or full-stack application) requires deep reasoning models with expansive context awareness.
+- **Debugging & crash analysis** requires high-precision diagnostic reasoning.
+- **Minor tweaks** (e.g., changing CSS colors, adjusting margins, fixing typos) do not warrant expensive reasoning models and are best handled by ultra-fast, low-latency models.
 
-Manually toggling models via CLI arguments or settings throughout a coding session creates friction. **Laya Router makes Antigravity task-aware and adaptive**, optimizing intelligence, latency, and cost while leaving the native agent execution loop completely intact.
+Manually switching models via CLI arguments or settings throughout a coding session creates unnecessary friction. **Laya Router makes coding agents task-aware and adaptive**, optimizing intelligence, turnaround latency, and cost while keeping the native agent workflow intact.
 
 ---
 
 ## Core Architecture
 
-Laya Router operates as a non-invasive decision layer inside Antigravity:
+Laya Router operates as a non-invasive decision layer across agent platforms:
 
 ```text
 User Request / Prompt
          ↓
-  Antigravity CLI (agy)
+Coding Agent CLI (Antigravity / Claude Code / etc.)
          ↓
-  Laya Router Plugin
+  Laya Router Layer
          ↓
 [ Task Classification ] ──→ deep_build / bug_fix / simple_change
          ↓
 [ Model Mapping ]       ──→ Target Model & Effort Selection
          ↓
-Native Antigravity Agent
+Native Coding Agent
          ↓
 Files / Terminal / Browser / Project Context
 ```
@@ -50,37 +51,57 @@ flowchart TD
     RouterDecision -->|Exceptions / Debugging| BugRoute[Route: bug_fix]
     RouterDecision -->|Styling / Copy / Quick Edits| SimpleRoute[Route: simple_change]
     
-    DeepRoute --> OpusModel[claude-opus-4-6-thinking / gemini-3.1-pro-high<br>Effort: High]
-    BugRoute --> SonnetModel[claude-sonnet-4-6 / gemini-3.8-flash-high<br>Effort: High]
-    SimpleRoute --> FlashModel[gemini-3.8-flash-low / gemini-3.7-flash-low<br>Effort: Low]
+    subgraph Antigravity Profile
+        DeepRoute -.-> AgyDeep[claude-opus-4-6-thinking / gemini-3.1-pro-high]
+        BugRoute -.-> AgyBug[claude-sonnet-4-6 / gemini-3.8-flash-high]
+        SimpleRoute -.-> AgySimple[gemini-3.8-flash-low / gemini-3.7-flash-low]
+    end
     
-    OpusModel --> AgentLoop[Antigravity Native Agent]
-    SonnetModel --> AgentLoop
-    FlashModel --> AgentLoop
+    subgraph Claude Code Profile
+        DeepRoute -.-> CCDeep[claude-opus-4-6-thinking / claude-3-7-sonnet]
+        BugRoute -.-> CCBug[claude-3-7-sonnet / claude-3-5-sonnet]
+        SimpleRoute -.-> CCSimple[claude-3-5-haiku]
+    end
+    
+    AgyDeep --> AgentLoop[Native Agent Execution Loop]
+    AgyBug --> AgentLoop
+    AgySimple --> AgentLoop
+    CCDeep --> AgentLoop
+    CCBug --> AgentLoop
+    CCSimple --> AgentLoop
 ```
 
 ---
 
-## Route Matrix & Model Mapping
+## Multi-Agent Route Matrix & Model Mapping
 
-Laya maps requests across three canonical operational routes matched against verified Antigravity models:
+Laya maps requests across three canonical operational routes, configured per agent platform:
 
-| Route | Example Prompt | Antigravity Target Model | Reasoning Effort | Role |
+### 1. Antigravity Profile (`agy`)
+| Route | Example Prompt | Target Model | Effort | Role |
 | :--- | :--- | :--- | :--- | :--- |
 | **`deep_build`** | *"Build a complete hospital management system"* | `claude-opus-4-6-thinking` *(fallback: `gemini-3.1-pro-high`)* | `high` | Architectural planning, multi-file code generation, complex refactoring |
 | **`bug_fix`** | *"Fix the appointment page crash"* | `claude-sonnet-4-6` *(fallback: `gemini-3.8-flash-high`)* | `high` | Root cause isolation, stack trace debugging, regression resolution |
 | **`simple_change`** | *"Change the button color to blue"* | `gemini-3.8-flash-low` *(fallback: `gemini-3.7-flash-low`)* | `low` | UI tweaks, wording/copy adjustments, documentation tweaks |
-| **Fallback** | *Ambiguous / Low-confidence prompt* | `gemini-3.8-flash-high` | `high` | Safe general-purpose fallback |
+
+### 2. Claude Code Profile
+| Route | Example Prompt | Target Model | Effort | Role |
+| :--- | :--- | :--- | :--- | :--- |
+| **`deep_build`** | *"Build a complete hospital management system"* | `claude-opus-4-6-thinking` *(fallback: `claude-3-7-sonnet`)* | `high` | Multi-step reasoning and systemic development |
+| **`bug_fix`** | *"Fix the appointment page crash"* | `claude-3-7-sonnet` *(fallback: `claude-3-5-sonnet`)* | `medium` | Targeted bug fixing, test failures, and diagnostics |
+| **`simple_change`** | *"Change the button color to blue"* | `claude-3-5-haiku` | `low` | Fast single-file changes, comments, small tweaks |
+
+*Note: Custom agent profiles can be defined in `laya_router/config.py`.*
 
 ---
 
 ## Key Features
 
-- **Native Antigravity Lifecycle Hook (`PreInvocation`)**: Automatically intercepts turns right before model dispatch, extracts prompt context from `transcript.jsonl`, and injects routing guidance into the session.
-- **Dynamic Turn-by-Turn Re-evaluation**: Re-assesses each turn dynamically so that task shifts during a long session (e.g. moving from building a feature to fixing an error) adapt automatically.
+- **Multi-Agent Plugin Architecture**: Ships with native plugin manifests for **Antigravity** (`plugin/plugin.json`) and **Claude Code** (`.claude-plugin/plugin.json`).
+- **Dynamic Turn-by-Turn Re-evaluation**: Re-assesses each prompt dynamically so that task shifts during a long project session (e.g., transitioning from architecture to bug fixing) adapt automatically.
 - **Sub-Millisecond Warm Daemon**: An optional background worker keeps the Laya neural router resident in memory, delivering routing decisions in **<15ms**.
-- **Confidence & Calibration Guardrails**: Uses raw softmax probability distributions to enforce confidence gating. If confidence drops below `50%`, the router automatically fails safe to `gemini-3.8-flash-high`.
-- **Standalone `laya` CLI Launcher**: Launch or resume Antigravity sessions directly with automated `--model` and `--effort` pre-selection.
+- **Confidence & Calibration Guardrails**: Uses raw softmax probability distributions to enforce confidence gating. If confidence drops below `50%`, the router automatically falls back to a safe default model.
+- **Universal CLI Launcher (`laya`)**: Launch or resume agent sessions directly with automated `--model` and `--effort` pre-selection across Antigravity and Claude Code.
 - **Auditable Telemetry**: Records routing history, token probabilities, and model transitions in `.laya/routing_history.jsonl`.
 
 ---
@@ -89,15 +110,18 @@ Laya maps requests across three canonical operational routes matched against ver
 
 ```text
 laya-plugin/
+├── .claude-plugin/
+│   └── plugin.json              # Claude Code plugin manifest
 ├── cli/
 │   └── laya_cli.py              # CLI launcher (laya run, laya chat, laya classify)
 ├── commands/
-│   └── laya.toml                # Native Antigravity /laya slash command
+│   └── laya.toml                # Native /laya slash command
 ├── hooks/
-│   └── pre_invocation.py        # Antigravity PreInvocation lifecycle hook
+│   ├── pre_invocation.py        # Antigravity PreInvocation lifecycle hook
+│   └── claude_prompt_hook.py    # Claude Code UserPromptSubmit hook
 ├── laya_router/
 │   ├── __init__.py
-│   ├── config.py                # Model mappings, criteria, and daemon config
+│   ├── config.py                # Multi-agent profiles (Antigravity, Claude Code, Generic)
 │   ├── decision.py              # Laya decision model & fallback engine
 │   ├── daemon.py                # Ultra-fast resident background worker
 │   └── client.py                # Dual-mode client (daemon query + in-process fallback)
@@ -119,7 +143,7 @@ laya-plugin/
 
 ### 1. Prerequisites
 - Python 3.9+
-- Antigravity CLI (`agy`) installed and configured
+- Antigravity CLI (`agy`) and/or Claude Code CLI (`claude`)
 - PyTorch / Transformers (automatically pulled by `laya`)
 
 ### 2. Install Python Dependencies
@@ -129,62 +153,53 @@ cd laya-plugin
 pip install -e .
 ```
 
-### 3. Install Plugin into Antigravity
-Install the plugin using the official `agy plugin` manager:
+### 3. Agent Integration
 
+#### For Antigravity (`agy`)
+Install the plugin using the official `agy plugin` manager:
 ```powershell
 agy plugin install ./plugin
 ```
-
-Verify that the plugin is recognized:
+Verify:
 ```powershell
 agy plugin list
 ```
-Output:
-```json
-{
-  "name": "laya-router",
-  "source": "antigravity",
-  "components": ["skills", "commands", "hooks"]
-}
-```
+
+#### For Claude Code
+Symlink or copy the repository into your Claude Code plugins directory or enable via `.claude-plugin/plugin.json`.
 
 ---
 
 ## Usage
 
-### 1. Standalone CLI Launcher (`laya`)
+### 1. Universal CLI Launcher (`laya`)
 
-#### Run a Single Task (Print Mode)
+#### Launch with Antigravity
 ```bash
 laya run "Build a complete hospital management system"
 # Automatically runs: agy --model claude-opus-4-6-thinking --effort high -p "..."
 ```
 
-#### Continue an Existing Session with Adaptive Routing
+#### Launch with Claude Code
 ```bash
-laya run -c "Fix the appointment page crash"
-# Resumes session with: agy --model claude-sonnet-4-6 --effort high -c ...
+laya run --agent claude_code "Fix the appointment page crash"
+# Automatically runs: claude --model claude-3-7-sonnet -p "..."
 ```
 
-#### Interactive Chat Session
-```bash
-laya chat "Change the button color to blue"
-```
-
-#### Inspect Task Route & Probabilities
+#### Classify and Inspect Route Probabilities
 ```bash
 laya classify "Refactor the database connection pool"
 ```
 Output:
 ```text
-[Laya Decision Engine] Analyzing task: "Refactor the database connection pool"
+[Laya Decision Engine] Analyzing task for [antigravity]: "Refactor the database connection pool"
 
 --- Laya Routing Decision ---
-  Route:        deep_build
-  Confidence:   84.6%
-  Target Model: claude-opus-4-6-thinking
-  Effort:       high
+  Agent Platform: antigravity
+  Route:          deep_build
+  Confidence:     84.6%
+  Target Model:   claude-opus-4-6-thinking
+  Effort:         high
   Probabilities:
     deep_build       84.6%  [################    ]
     bug_fix          11.2%  [##                  ]
@@ -192,19 +207,23 @@ Output:
 -----------------------------
 ```
 
-### 2. In-Session Antigravity Integration
+### 2. Python API
 
-When working inside a standard Antigravity session, the **`PreInvocation` hook runs automatically before every turn**.
+Integrate Laya Router directly into any custom agent workflow:
 
-If a task matches a different tier than your active model, Laya injects an ephemeral directive:
-```text
-[Laya Router] Task Route: `deep_build` (Confidence: 89.8% | Probabilities: deep_build: 90%, bug_fix: 6%, simple_change: 4%)
-  Optimal Antigravity Model: `claude-opus-4-6-thinking` (effort: high)
-  Current Active Model: `gemini-3.8-flash-high`
-  [Adaptive Guidance] Align reasoning depth and tool invocation strategy with the `deep_build` route.
+```python
+from laya_router import route_prompt
+
+# Route for Antigravity
+decision = route_prompt("Build an analytics dashboard with websockets", profile="antigravity")
+print(decision.route)         # "deep_build"
+print(decision.target_model)  # "claude-opus-4-6-thinking"
+
+# Route for Claude Code
+decision_cc = route_prompt("Change the button color to blue", profile="claude_code")
+print(decision_cc.route)         # "simple_change"
+print(decision_cc.target_model)  # "claude-3-5-haiku"
 ```
-
-You can also run `/laya` inside Antigravity at any time to inspect current routing metrics.
 
 ---
 

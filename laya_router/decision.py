@@ -21,6 +21,8 @@ except ImportError:
 from laya_router.config import (
     DEFAULT_CRITERIA,
     ROUTE_TO_MODEL_MAP,
+    AGENT_MODEL_PROFILES,
+    DEFAULT_PROFILE,
     FALLBACK_ROUTE,
     FALLBACK_MODEL,
     DEFAULT_CONFIDENCE_THRESHOLD,
@@ -87,16 +89,18 @@ class LayaDecisionEngine:
             cls._instance = cls()
         return cls._instance
 
-    def evaluate(self, prompt: str) -> DecisionResult:
+    def evaluate(self, prompt: str, profile: str = DEFAULT_PROFILE) -> DecisionResult:
         """
-        Classifies an incoming task prompt into a route and maps to an Antigravity model.
+        Classifies an incoming task prompt into a route and maps to an agent model.
         """
         prompt_clean = (prompt or "").strip()
+        profile_mapping = AGENT_MODEL_PROFILES.get(profile, ROUTE_TO_MODEL_MAP)
+
         if not prompt_clean:
-            return self._create_fallback("Empty prompt provided")
+            return self._create_fallback("Empty prompt provided", profile_mapping)
 
         if self._router is None:
-            return self._heuristic_fallback(prompt_clean, "Laya package or router uninitialized")
+            return self._heuristic_fallback(prompt_clean, "Laya package or router uninitialized", profile_mapping)
 
         try:
             route_label = self._router.invoke(prompt_clean)
@@ -113,18 +117,19 @@ class LayaDecisionEngine:
 
             # Confidence Gating / Fallback
             if confidence < self.confidence_threshold:
+                fb_model = profile_mapping.get(FALLBACK_ROUTE, {}).get("model", FALLBACK_MODEL)
                 return DecisionResult(
                     route=FALLBACK_ROUTE,
                     confidence=confidence,
                     probabilities=probs,
-                    target_model=FALLBACK_MODEL,
+                    target_model=fb_model,
                     effort="high",
                     is_fallback=True,
                     raw_reason=f"Confidence {confidence:.2%} below threshold {self.confidence_threshold:.2%}",
                 )
 
-            # Map route to Antigravity model
-            mapping = ROUTE_TO_MODEL_MAP.get(route_label, ROUTE_TO_MODEL_MAP[FALLBACK_ROUTE])
+            # Map route to agent model based on profile
+            mapping = profile_mapping.get(route_label, profile_mapping[FALLBACK_ROUTE])
             return DecisionResult(
                 route=route_label,
                 confidence=confidence,
@@ -136,10 +141,11 @@ class LayaDecisionEngine:
             )
 
         except Exception as ex:
-            return self._heuristic_fallback(prompt_clean, f"Laya inference error: {ex}")
+            return self._heuristic_fallback(prompt_clean, f"Laya inference error: {ex}", profile_mapping)
 
-    def _create_fallback(self, reason: str) -> DecisionResult:
-        mapping = ROUTE_TO_MODEL_MAP[FALLBACK_ROUTE]
+    def _create_fallback(self, reason: str, profile_mapping: Optional[Dict[str, Any]] = None) -> DecisionResult:
+        pm = profile_mapping or ROUTE_TO_MODEL_MAP
+        mapping = pm[FALLBACK_ROUTE]
         return DecisionResult(
             route=FALLBACK_ROUTE,
             confidence=0.0,
@@ -150,8 +156,9 @@ class LayaDecisionEngine:
             raw_reason=reason,
         )
 
-    def _heuristic_fallback(self, prompt: str, reason: str) -> DecisionResult:
+    def _heuristic_fallback(self, prompt: str, reason: str, profile_mapping: Optional[Dict[str, Any]] = None) -> DecisionResult:
         """Fast keyword-based heuristic used when Laya model is loading or unavailable."""
+        pm = profile_mapping or ROUTE_TO_MODEL_MAP
         p = prompt.lower()
         if any(w in p for w in ["build", "create", "architecture", "implement", "system", "full", "design", "refactor"]):
             route = "deep_build"
@@ -166,7 +173,7 @@ class LayaDecisionEngine:
             route = FALLBACK_ROUTE
             conf = 0.50
 
-        mapping = ROUTE_TO_MODEL_MAP.get(route, ROUTE_TO_MODEL_MAP[FALLBACK_ROUTE])
+        mapping = pm.get(route, pm[FALLBACK_ROUTE])
         return DecisionResult(
             route=route,
             confidence=conf,
